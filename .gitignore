@@ -1,0 +1,10 @@
+# Anwenderdaten (enthalten Kunden-IPs) – nie ins Repo
+profiles.json
+profiles.json.*
+settings.json
+# Build-Ergebnisse (exe kommt als Release-Asset)
+*.exe
+*.exe.old
+*.exe.new
+src/app.ico
+dist/
