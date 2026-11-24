@@ -207,37 +207,28 @@ namespace IpUmschalter
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false; MinimizeBox = false; ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
-            ClientSize = new Size(470, 316);
+            ClientSize = new Size(470, 224);
 
             chkAuto.Text = "Mit Windows starten (im Infobereich neben der Uhr)";
             chkAuto.SetBounds(16, 16, 440, 24); Controls.Add(chkAuto);
 
             chkNoUac.Text = "Ohne Admin-Abfrage starten";
-            chkNoUac.SetBounds(16, 50, 440, 24); Controls.Add(chkNoUac);
-            var hint = new Label
-            {
-                Text = "Legt dazu die Aufgabe „" + TaskSetup.TaskName + "“ in der Windows-Aufgabenplanung an, die das Programm " +
-                       "mit Adminrechten startet. Gilt auch für Desktop-Verknüpfungen. Ohne die Aufgabe fragt Windows bei jedem Start.",
-                ForeColor = SystemColors.GrayText
-            };
-            hint.SetBounds(34, 76, 420, 50); Controls.Add(hint);
+            chkNoUac.SetBounds(16, 48, 440, 24); Controls.Add(chkNoUac);
 
             chkUpdate.Text = "Automatisch aktualisieren";
-            chkUpdate.SetBounds(16, 136, 330, 24); Controls.Add(chkUpdate);
+            chkUpdate.SetBounds(16, 82, 330, 24); Controls.Add(chkUpdate);
             var btnCheck = new Button { Text = "Jetzt suchen" };
-            btnCheck.SetBounds(356, 134, 100, 28); Controls.Add(btnCheck);
+            btnCheck.SetBounds(356, 80, 100, 28); Controls.Add(btnCheck);
             btnCheck.Click += delegate { if (checkNow != null) checkNow(); };
-            var updHint = new Label { Text = "Prüft alle 6 Stunden github.com/" + Updater.Repo + ".", ForeColor = SystemColors.GrayText };
-            updHint.SetBounds(34, 164, 420, 20); Controls.Add(updHint);
 
             var folder = new Button { Text = "Programmordner öffnen" };
-            folder.SetBounds(16, 206, 180, 28); Controls.Add(folder);
+            folder.SetBounds(16, 128, 180, 28); Controls.Add(folder);
             folder.Click += delegate { Process.Start("explorer.exe", "\"" + AppDomain.CurrentDomain.BaseDirectory.TrimEnd('\\') + "\""); };
-            var ver = new Label { Text = "Version " + Program.Version + " · Profile in profiles.json", ForeColor = SystemColors.GrayText, AutoSize = true };
-            ver.Location = new Point(206, 212); Controls.Add(ver);
+            var ver = new Label { Text = "Version " + Program.Version, ForeColor = SystemColors.GrayText, AutoSize = true };
+            ver.Location = new Point(206, 134); Controls.Add(ver);
 
-            var ok = new Button { Text = "OK" }; ok.SetBounds(278, 272, 85, 30); Controls.Add(ok);
-            var cancel = new Button { Text = "Abbrechen", DialogResult = DialogResult.Cancel }; cancel.SetBounds(371, 272, 85, 30); Controls.Add(cancel);
+            var ok = new Button { Text = "OK" }; ok.SetBounds(278, 180, 85, 30); Controls.Add(ok);
+            var cancel = new Button { Text = "Abbrechen", DialogResult = DialogResult.Cancel }; cancel.SetBounds(371, 180, 85, 30); Controls.Add(cancel);
             AcceptButton = ok; CancelButton = cancel;
 
             var st = TaskSetup.Query();

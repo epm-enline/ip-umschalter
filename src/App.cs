@@ -22,7 +22,7 @@ namespace IpUmschalter
 {
     static class Program
     {
-        public const string Version = "1.1.0";   // einzige Versionsquelle (Assembly-Version, Release-Tag, Update-Vergleich)
+        public const string Version = "1.1.1";   // einzige Versionsquelle (Assembly-Version, Release-Tag, Update-Vergleich)
         const string MutexName = "Local\\IpUmschalter.Instanz";
 
         [DllImport("user32.dll")] static extern bool SetProcessDPIAware();
@@ -206,7 +206,7 @@ namespace IpUmschalter
             updTimer.Tick += delegate
             {
                 updTimer.Interval = pendingUpdate != null ? 60 * 1000 : 6 * 3600 * 1000;
-                if (pendingUpdate != null) TryInstall();
+                if (pendingUpdate != null) TryInstall(false);
                 else if (Settings.Load().AutoUpdate) CheckUpdate(false);
             };
             updTimer.Start();
@@ -237,15 +237,28 @@ namespace IpUmschalter
                     return;
                 }
                 pendingUpdate = t.Result[0];
-                TryInstall();
+                if (manual) tray.ShowBalloonTip(3000, "IP-Umschalter", "Version " + t.Result[1] + " wird installiert …", ToolTipIcon.Info);
+                TryInstall(manual);
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        /// <summary>Setzt die geladene exe ein und startet neu – nicht während einer Umschaltung oder mit ungespeicherten Eingaben.</summary>
-        void TryInstall()
+        /// <summary>Setzt die geladene exe ein und startet neu – nie während einer Umschaltung.
+        /// Ungespeicherte Eingaben: automatisch → später; manual („Jetzt suchen“) → Speichern-Rückfrage.</summary>
+        void TryInstall(bool manual)
         {
             if (pendingUpdate == null || !File.Exists(pendingUpdate)) { pendingUpdate = null; return; }
-            if (busy || (form != null && !form.IsDisposed && form.IsDirty)) return; // später erneut (Timer)
+            if (busy) { RetrySoon(); return; } // Activate ruft nach der Umschaltung erneut auf
+            if (form != null && !form.IsDisposed && form.IsDirty)
+            {
+                if (!manual || !form.ConfirmLeave()) { RetrySoon(); return; }
+            }
+            if (openSettings != null)
+            {
+                // Einstellungsfenster (modal) erst schließen, dann neu ansetzen
+                openSettings.Close();
+                marshal.BeginInvoke(new Action(() => TryInstall(manual)));
+                return;
+            }
             string exe = Application.ExecutablePath;
             bool shown = form != null && !form.IsDisposed && form.Visible;
             try { Updater.Swap(exe, pendingUpdate); }
@@ -268,6 +281,8 @@ namespace IpUmschalter
             if (cmd == "ping") return;
             if (cmd == "exit") { ExitApp(); return; }
             if (cmd == "update") { CheckUpdate(false); return; }
+            if (cmd == "update-now") { CheckUpdate(true); return; }          // wie „Jetzt suchen“
+            if (cmd == "settings") { ShowSettings(null); return; }
             if (cmd == "tray") { if (model.Profiles.Count == 0) ShowForm(); return; }
             if (cmd.StartsWith("apply\t"))
             {
@@ -291,7 +306,19 @@ namespace IpUmschalter
 
         public void ShowSettings(IWin32Window owner)
         {
-            using (var f = new SettingsForm(() => CheckUpdate(true))) f.ShowDialog(owner);
+            if (openSettings != null) { openSettings.Activate(); return; }
+            using (var f = new SettingsForm(() => CheckUpdate(true)))
+            {
+                openSettings = f;
+                try { f.ShowDialog(owner); } finally { openSettings = null; }
+            }
+        }
+
+        SettingsForm openSettings;
+
+        void RetrySoon()
+        {
+            updTimer.Stop(); updTimer.Interval = 60 * 1000; updTimer.Start();
         }
 
         void BuildMenu()

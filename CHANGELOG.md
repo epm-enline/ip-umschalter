@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1.1] – 2026-11-24
+- „Jetzt suchen“ installiert eine neue Version sofort und startet neu (schließt die Einstellungen; bei ungespeicherten Profiländerungen kommt die Speichern-Rückfrage).
+- Einstellungen ohne Erklärtexte.
+- Fix: ein wegen laufender Umschaltung verschobenes Update wurde erst nach 6 h statt nach 1 min erneut versucht.
+
 ## [1.1.0] – 2026-11-24
 - Start ohne UAC-Abfrage: Aufgabe „IP-Umschalter“ in der Aufgabenplanung (wird beim ersten Start angelegt).
 - Einstellungen: Autostart mit Windows, Start ohne Admin-Abfrage, automatisch aktualisieren.
