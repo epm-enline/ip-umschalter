@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.1.2] – 2026-11-24
+- Kein Hinweis „läuft weiter“ mehr beim Schließen oder Minimieren des Fensters.
+
 ## [1.1.1] – 2026-11-24
 - „Jetzt suchen“ installiert eine neue Version sofort und startet neu (schließt die Einstellungen; bei ungespeicherten Profiländerungen kommt die Speichern-Rückfrage).
 - Einstellungen ohne Erklärtexte.

@@ -22,7 +22,7 @@ namespace IpUmschalter
 {
     static class Program
     {
-        public const string Version = "1.1.1";   // einzige Versionsquelle (Assembly-Version, Release-Tag, Update-Vergleich)
+        public const string Version = "1.1.2";   // einzige Versionsquelle (Assembly-Version, Release-Tag, Update-Vergleich)
         const string MutexName = "Local\\IpUmschalter.Instanz";
 
         [DllImport("user32.dll")] static extern bool SetProcessDPIAware();
@@ -171,7 +171,6 @@ namespace IpUmschalter
         MainForm form;
         bool busy;
 
-        bool trayHintShown;
 
         readonly System.Windows.Forms.Timer updTimer = new System.Windows.Forms.Timer();
         bool updating;
@@ -294,14 +293,6 @@ namespace IpUmschalter
                 return;
             }
             ShowForm();
-        }
-
-        /// <summary>Fenster wurde geschlossen → einmal pro Sitzung zeigen, wo das Programm weiterläuft.</summary>
-        public void HiddenToTray()
-        {
-            if (trayHintShown) return;
-            trayHintShown = true;
-            tray.ShowBalloonTip(3000, "IP-Umschalter läuft weiter", "Rechtsklick auf das IP-Symbol: Profil wählen. Linksklick: Fenster.", ToolTipIcon.Info);
         }
 
         public void ShowSettings(IWin32Window owner)
@@ -820,7 +811,6 @@ namespace IpUmschalter
                 e.Cancel = true;
                 Hide();
                 LoadEditor(current);
-                app.HiddenToTray();
                 return;
             }
             base.OnFormClosing(e);
@@ -834,7 +824,6 @@ namespace IpUmschalter
             {
                 Hide();
                 WindowState = FormWindowState.Normal;
-                app.HiddenToTray();
             }
         }
     }
