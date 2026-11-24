@@ -22,7 +22,7 @@ namespace IpUmschalter
 {
     static class Program
     {
-        public const string Version = "1.1.2";   // einzige Versionsquelle (Assembly-Version, Release-Tag, Update-Vergleich)
+        public const string Version = "1.1.3";   // einzige Versionsquelle (Assembly-Version, Release-Tag, Update-Vergleich)
         const string MutexName = "Local\\IpUmschalter.Instanz";
 
         [DllImport("user32.dll")] static extern bool SetProcessDPIAware();
@@ -441,8 +441,8 @@ namespace IpUmschalter
             Font = new Font("Segoe UI", 9f);
             AutoScaleDimensions = new SizeF(96f, 96f);
             AutoScaleMode = AutoScaleMode.Dpi;
-            FormBorderStyle = FormBorderStyle.FixedSingle;
-            MaximizeBox = false;
+            FormBorderStyle = FormBorderStyle.Sizable;
+            MaximizeBox = true;
             StartPosition = FormStartPosition.CenterScreen;
             ClientSize = new Size(820, 534);
 
@@ -504,8 +504,10 @@ namespace IpUmschalter
             lblStatus.SetBounds(12, 500, 796, 24);
             lblStatus.TextAlign = ContentAlignment.MiddleLeft;
             Controls.Add(lblStatus);
+            SetAnchors();
             ResumeLayout(false);
             PerformLayout();
+            MinimumSize = Size; // Ausgangsgröße = kleinste Größe
 
             // Ereignisse
             list.SelectedIndexChanged += delegate { OnSelect(); };
@@ -532,6 +534,26 @@ namespace IpUmschalter
             FillAdapters(null);
             RefreshList();
             if (model.Profiles.Count > 0) list.SelectedIndex = 0; else LoadEditor(-1);
+        }
+
+        /// <summary>Beim Vergrößern wachsen Profilliste und IP-Tabelle; Eingabefelder werden breiter,
+        /// alles unter der Tabelle wandert mit dem unteren Rand.</summary>
+        void SetAnchors()
+        {
+            var wide = new Control[] { txtName, cmbAdapter, txtDns, txtState };
+            var right = new Control[] { btnRefresh, btnTake, btnLink };
+            int gridBottom = grid.Bottom, listBottom = list.Bottom;
+            foreach (Control c in Controls)
+            {
+                if (c == grid) { c.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right; continue; }
+                if (c == list) { c.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left; continue; }
+                if (c == lblStatus) { c.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right; continue; }
+                bool leftColumn = c.Left < 230;
+                AnchorStyles v = (leftColumn ? c.Top > listBottom : c.Top > gridBottom) ? AnchorStyles.Bottom : AnchorStyles.Top;
+                AnchorStyles h = wide.Contains(c) ? AnchorStyles.Left | AnchorStyles.Right
+                               : right.Contains(c) ? AnchorStyles.Right : AnchorStyles.Left;
+                c.Anchor = v | h;
+            }
         }
 
         void Add(Control c) { Controls.Add(c); }

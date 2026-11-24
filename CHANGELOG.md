@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.1.3] – 2026-11-24
+- Fenster lässt sich vergrößern und maximieren: Profilliste und IP-Tabelle wachsen mit, Eingabefelder werden breiter. Kleiner als die Ausgangsgröße geht nicht.
+
 ## [1.1.2] – 2026-11-24
 - Kein Hinweis „läuft weiter“ mehr beim Schließen oder Minimieren des Fensters.
 
